@@ -1,9 +1,10 @@
+using System.Collections;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class GemController : MonoBehaviour
+public class Booster : MonoBehaviour
 {
-    private SpriteRenderer _spriteRenderer;
+    public static float SpeedMultiplier = 1f;
+    
     private Rigidbody2D _rb;
     private LayerMask _layer;
 
@@ -14,12 +15,16 @@ public class GemController : MonoBehaviour
 
     private void Start()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         _rb = GetComponent<Rigidbody2D>();
-
-        _spriteRenderer.sprite = GameManager.Instance.RandomSprite();
         
         _rb.AddTorque(Random.Range(-0.5f, 0.5f), ForceMode2D.Impulse);
+    }
+
+    public static IEnumerator SpeedBoost()
+    {
+        SpeedMultiplier = 1.5f;
+        yield return new WaitForSeconds(5f);
+        SpeedMultiplier = 1f;
     }
 
     public void Sink()
@@ -27,5 +32,4 @@ public class GemController : MonoBehaviour
         _rb.gravityScale = 0.5f;
         gameObject.layer = _layer;
     }
-    
 }

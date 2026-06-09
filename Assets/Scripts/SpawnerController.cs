@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class SpawnerController : MonoBehaviour
 {
@@ -12,8 +11,7 @@ public class SpawnerController : MonoBehaviour
     private void Start()
     {
         objects = new List<GameObject>();
-        objects.Add(Resources.Load<GameObject>("Gem"));
-        objects.Add(Resources.Load<GameObject>("Boulder"));
+        objects.AddRange(Resources.LoadAll<GameObject>("gameobjects"));
         
         spawns = new List<GameObject>();
         spawns.AddRange(GameObject.FindGameObjectsWithTag("Spawn Point"));
@@ -29,7 +27,7 @@ public class SpawnerController : MonoBehaviour
 
     private void Update()
     {
-        if (isActive)
+        if (isActive && GameManager.Instance.currentGameState != GameManager.GameState.End)
         {
             StartCoroutine(Spawner());
         }
@@ -37,12 +35,19 @@ public class SpawnerController : MonoBehaviour
 
     private IEnumerator Spawner()
     {
-        var randomObject = Random.Range(0, objects.Count);
-        var randomSpawn = Random.Range(0, spawnsT.Count);
-        
-        Instantiate(objects[randomObject], spawnsT[randomSpawn]);
         isActive = false;
-        yield return new WaitForSeconds(1f);
+        
+        foreach (var spawn in spawnsT)
+        {
+            var index = GameManager.Instance.RandomIndex(objects.Count);
+            
+            if (index <= -1 || (index == 0 && Random.Range(0, 10) < 9)) continue;
+            
+            Instantiate(objects[index], spawn);
+
+            yield return new WaitForSeconds(.75f);
+        }
+        
         isActive = true;
     }
     
