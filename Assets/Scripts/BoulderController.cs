@@ -22,13 +22,13 @@ public class BoulderController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Sink();
+            gameObject.layer = _layer;
         }
-    }
-
-    public void Sink()
-    {
-        gameObject.layer = _layer;
-        _rb.gravityScale = 0.5f;
+        if (other.gameObject.CompareTag("Water"))
+        {
+            AudioManager.Instance.PlaySound(AudioManager.SoundType.BoulderSplash);
+            gameObject.layer = _layer;
+            _rb.gravityScale = 0.5f;
+        }
     }
 }

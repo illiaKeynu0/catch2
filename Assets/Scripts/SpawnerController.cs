@@ -1,54 +1,73 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SpawnerController : MonoBehaviour
 {
-    private List<GameObject> objects, spawns;
-    private List<Transform> spawnsT;
-    private bool isActive;
+    public static SpawnerController Instance;
     
-    private void Start()
+    private List<GameObject> _objects, _spawns;
+    private List<Transform> _spawnsT;
+    private bool _isActive;
+
+    private void Awake()
     {
-        objects = new List<GameObject>();
-        objects.AddRange(Resources.LoadAll<GameObject>("gameobjects"));
-        
-        spawns = new List<GameObject>();
-        spawns.AddRange(GameObject.FindGameObjectsWithTag("Spawn Point"));
-
-        spawnsT = new List<Transform>();
-        foreach (var spawn in spawns)
+        if (!Instance)
         {
-            spawnsT.Add(spawn.transform);
+            Instance = this;
         }
-
-        isActive = true;
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private void Update()
+    private void Start()
     {
-        if (isActive && GameManager.Instance.currentGameState != GameManager.GameState.End)
+        _objects = new List<GameObject>();
+        _objects.AddRange(Resources.LoadAll<GameObject>("gameobjects"));
+        
+        _spawns = new List<GameObject>();
+        _spawns.AddRange(GameObject.FindGameObjectsWithTag("Spawn Point"));
+
+        _spawnsT = new List<Transform>();
+        foreach (var spawn in _spawns)
         {
-            StartCoroutine(Spawner());
+            _spawnsT.Add(spawn.transform);
         }
+        
+        Activation();
+    }
+
+    public void Activation()
+    {
+        if (!_isActive) StartCoroutine(Spawner());
     }
 
     private IEnumerator Spawner()
     {
-        isActive = false;
+        _isActive = true;
         
-        foreach (var spawn in spawnsT)
+        foreach (var spawn in _spawnsT)
         {
-            var index = GameManager.Instance.RandomIndex(objects.Count);
+            if (GameManager.Instance.currentGameState == GameManager.GameState.End)
+            {
+                _isActive = false;
+                yield break;
+            }
+
+            var index = GameManager.Instance.RandomIndex(_objects.Count);
             
             if (index <= -1 || (index == 0 && Random.Range(0, 10) < 9)) continue;
             
-            Instantiate(objects[index], spawn);
+            Instantiate(_objects[index], spawn);
 
-            yield return new WaitForSeconds(.75f);
+            yield return new WaitForSeconds(1.75f - PlayerController.Instance.speedMultiplier);
         }
-        
-        isActive = true;
+
+        _isActive = false;
+        Activation();
     }
     
 }

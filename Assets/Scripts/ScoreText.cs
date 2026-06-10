@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class ScoreText : MonoBehaviour
 {
-    private TextMeshProUGUI _text;
+    private static TextMeshProUGUI text;
 
     private void Start()
     {
-        _text = GetComponent<TextMeshProUGUI>();
+        text = GetComponent<TextMeshProUGUI>();
     }
-
-    private void Update()
+    
+    public static void TextUpdate(int score)
     {
-        _text.text = GameManager.Instance.score.ToString();
+        text.text = score.ToString();
     }
 }

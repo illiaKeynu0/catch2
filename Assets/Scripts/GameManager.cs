@@ -43,43 +43,33 @@ public class GameManager : MonoBehaviour
         
         ResumeGame();
     }
-
-    private void Update()
-    {
-        if (health <= 0)
-        {
-            EndGame();
-        }
-    }
-
-    public void ResetGame()
-    {
-        if (PlayerController.Instance.ReplayPressed)
-        {
-            PlayerController.Instance.ReplayPressed = false;
-            
-            health = 2;
-            score = 0;
-
-            StartCoroutine(ResetTimer());
-        }
-    }
     
     private void ResumeGame()
     {
         currentGameState = GameState.Start;
+        
+        WaterLayer.Instance.Activation();
+        
+        SpawnerController.Instance.Activation();
+        
+        HighScoreText.HideScore();
     }
     
     private void EndGame()
     {
         currentGameState = GameState.End;
         
-        if (score > highScore)
-        {
-            highScore = score;
-        }
+        HighScoreText.TextUpdate(highScore);
 
-        ResetGame();
+        WaterLayer.Instance.StartCoroutine(nameof(WaterLayer.ResetPosition));
+    }
+    
+    public void ResetGame()
+    {
+        health = 2;
+        score = 0;
+
+        StartCoroutine(ResetTimer());
     }
 
     public Sprite RandomSprite()
@@ -94,20 +84,30 @@ public class GameManager : MonoBehaviour
         return randomObject;
     }
 
-    public void AddScore()
+    public void AddScore(int i)
     {
-        score++;
+        score += i;
+        ScoreText.TextUpdate(score);
+        
+        if (score > highScore)
+        {
+            highScore = score;
+        }
     }
 
-    public void Hit()
+    public void PlayerHit(int i)
     {
-        health--;
+        health -= i;
+        HealthText.TextUpdate(health);
+        AudioManager.Instance.PlaySound(AudioManager.SoundType.PlayerHurt);
+        
+        if (health <= 0) EndGame();
     }
 
     private IEnumerator ResetTimer()
     {
         currentGameState = GameState.Reset;
-
+        
         yield return new WaitForSeconds(.1f);
         
         ResumeGame();

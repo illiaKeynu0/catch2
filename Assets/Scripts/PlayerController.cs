@@ -1,24 +1,31 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance;
-
-    public bool ReplayPressed;
+    
+    [HideInInspector] public float speedMultiplier = 1f;
     
     private static readonly int Hit = Animator.StringToHash("Hit");
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
-
+    
     private Vector2 MoveInput;
+
+    private bool _isBoosted;
 
     private void Awake()
     {
         if (!Instance)
         {
             Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -38,9 +45,9 @@ public class PlayerController : MonoBehaviour
     
     public void OnReplay(InputValue button)
     {
-        if (button.isPressed && GameManager.Instance.currentGameState == GameManager.GameState.End && WaterLayer.OnStart)
+        if (button.isPressed && GameManager.Instance.currentGameState == GameManager.GameState.End && WaterLayer.Instance.isReset)
         {
-            ReplayPressed = true;
+            GameManager.Instance.ResetGame();
         }
     }
 
@@ -60,7 +67,7 @@ public class PlayerController : MonoBehaviour
     {
         if (GameManager.Instance.currentGameState != GameManager.GameState.End)
         {
-            _rb.AddForce(MoveInput * (70f * Booster.SpeedMultiplier), ForceMode2D.Force);
+            _rb.AddForce(MoveInput * (70f * speedMultiplier), ForceMode2D.Force);
         }
     }
 
@@ -68,17 +75,12 @@ public class PlayerController : MonoBehaviour
     {
         switch (other.gameObject.tag)
         {
-            case "Gem":
-                Destroy(other.gameObject);
-                GameManager.Instance.AddScore();
-                break;
             case "Boulder":
                 _animator.SetTrigger(Hit);
-                GameManager.Instance.Hit();
+                GameManager.Instance.PlayerHit(1);
                 break;
             case "Booster":
-                StartCoroutine(Booster.SpeedBoost());
-                Destroy(other.gameObject);
+                StartCoroutine(SpeedBoost());
                 break;
         }
     }
@@ -87,5 +89,19 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Boulder"))
             _animator.ResetTrigger(Hit);
+    }
+
+    private IEnumerator SpeedBoost()
+    {
+        if (_isBoosted) yield break;
+
+        _isBoosted = true;
+        
+        speedMultiplier = 1.5f;
+        yield return new WaitForSeconds(5f);
+
+        _isBoosted = false;
+        
+        speedMultiplier = 1f;
     }
 }

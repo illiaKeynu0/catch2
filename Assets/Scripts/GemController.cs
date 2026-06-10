@@ -21,11 +21,20 @@ public class GemController : MonoBehaviour
         
         _rb.AddTorque(Random.Range(-0.5f, 0.5f), ForceMode2D.Impulse);
     }
-
-    public void Sink()
-    {
-        _rb.gravityScale = 0.5f;
-        gameObject.layer = _layer;
-    }
     
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            AudioManager.Instance.PlaySound(AudioManager.SoundType.GemCollect);
+            GameManager.Instance.AddScore(1);
+            Destroy(gameObject);
+        }
+        if (other.gameObject.CompareTag("Water"))
+        {
+            AudioManager.Instance.PlaySound(AudioManager.SoundType.GemSplash);
+            gameObject.layer = _layer;
+            _rb.gravityScale = 0.5f;
+        }
+    }
 }

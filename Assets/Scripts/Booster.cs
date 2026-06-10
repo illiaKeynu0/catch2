@@ -1,10 +1,8 @@
-using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Booster : MonoBehaviour
 {
-    public static float SpeedMultiplier = 1f;
-    
     private Rigidbody2D _rb;
     private LayerMask _layer;
 
@@ -19,17 +17,20 @@ public class Booster : MonoBehaviour
         
         _rb.AddTorque(Random.Range(-0.5f, 0.5f), ForceMode2D.Impulse);
     }
-
-    public static IEnumerator SpeedBoost()
+    
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        SpeedMultiplier = 1.5f;
-        yield return new WaitForSeconds(5f);
-        SpeedMultiplier = 1f;
-    }
-
-    public void Sink()
-    {
-        _rb.gravityScale = 0.5f;
-        gameObject.layer = _layer;
+        if (other.gameObject.CompareTag("Player"))
+        {
+            AudioManager.Instance.PlaySound(AudioManager.SoundType.Booster);
+            GameManager.Instance.AddScore(2);
+            Destroy(gameObject);
+        }
+        if (other.gameObject.CompareTag("Water"))
+        {
+            AudioManager.Instance.PlaySound(AudioManager.SoundType.GemSplash);
+            gameObject.layer = _layer;
+            _rb.gravityScale = 0.5f;
+        }
     }
 }

@@ -3,61 +3,66 @@ using UnityEngine;
 
 public class WaterLayer : MonoBehaviour
 {
-    public static bool OnStart;
+    public static WaterLayer Instance;
     
-    private bool _isActive;
+    public bool isReset;
+    
     private Vector2 _originalPosition;
+    private bool _isMoving;
+    
+    private void Awake()
+    {
+        if (!Instance)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {
         _originalPosition = transform.position;
         
-        _isActive = true;
+        Activation();
     }
 
-    private void Update()
+    public void Activation()
     {
-        if (_isActive && GameManager.Instance.currentGameState == GameManager.GameState.Start)
-        {
-            StartCoroutine(ChangeY());
-            OnStart = false;
-        }
-        else if (GameManager.Instance.currentGameState == GameManager.GameState.End)
+        if (!_isMoving) StartCoroutine(ChangeY());
+    }
+
+    public IEnumerator ResetPosition()
+    {
+        while (Vector2.Distance(transform.position, _originalPosition) > 0.001)
         {
             transform.position = Vector2.MoveTowards(transform.position, _originalPosition, 2f * Time.deltaTime);
-            if (transform.position.y <= -8.5f)
-            {
-                OnStart = true;
-            }
+            yield return new WaitForEndOfFrame();
         }
-    }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        switch (other.gameObject.tag)
-        {
-            case "Gem":
-                other.gameObject.GetComponent<GemController>().Sink();
-                break;
-            case "Boulder":
-                other.gameObject.GetComponent<BoulderController>().Sink();
-                break;
-            case "Booster":
-                other.gameObject.GetComponent<Booster>().Sink();
-                break;
-        }
+        isReset = true;
     }
 
     private IEnumerator ChangeY()
     {
-        _isActive = false;
+        isReset = false;
+        _isMoving = true;
+        
+        if (GameManager.Instance.currentGameState == GameManager.GameState.End)
+        {
+            _isMoving = false;
+            yield break;
+        }
         
         var T = transform.position;
-        T.y += .1f;
+        T.y += .01f;
         transform.position = T;
         
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.2f);
         
-        _isActive = true;
+        _isMoving = false;
+        Activation();
     }
 }

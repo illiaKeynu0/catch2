@@ -3,14 +3,15 @@ using UnityEngine;
 
 public class HealthText : MonoBehaviour
 {
-    private TextMeshProUGUI _text;
+    private static TextMeshProUGUI text;
 
     private void Start()
     {
-        _text = GetComponent<TextMeshProUGUI>();
+        text = GetComponent<TextMeshProUGUI>();
     }
 
-    private void Update()
+    public static void TextUpdate(int health)
     {
-        _text.text = GameManager.Instance.health.ToString();
-    }}
+        text.text = Mathf.Max(0, health).ToString();
+    }
+}
