@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LevelReset : MonoBehaviour
+public class CTR_LevelReset : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {

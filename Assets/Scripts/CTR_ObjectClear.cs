@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ObjectClear : MonoBehaviour
+public class CTR_ObjectClear : MonoBehaviour
 {
     private void OnCollisionEnter2D (Collision2D other)
     {
