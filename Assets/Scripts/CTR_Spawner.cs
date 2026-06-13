@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class SpawnerController : MonoBehaviour
+public class CTR_Spawner : MonoBehaviour
 {
-    public static SpawnerController Instance;
+    public static CTR_Spawner Instance;
     
     private List<GameObject> _objects, _spawns;
     private List<Transform> _spawnsT;
@@ -51,21 +51,23 @@ public class SpawnerController : MonoBehaviour
         
         foreach (var spawn in _spawnsT)
         {
-            if (GameManager.Instance.currentGameState == GameManager.GameState.End)
+            if (_SYS_GameManager.Instance.currentGameState == _SYS_GameManager.GameState.End)
             {
                 _isActive = false;
                 yield break;
             }
 
-            var index = GameManager.Instance.RandomIndex(_objects.Count);
+            var index = _SYS_GameManager.Instance.RandomIndex(_objects.Count);
             
             if (index <= -1 || (index == 0 && Random.Range(0, 10) < 9)) continue;
             
             Instantiate(_objects[index], spawn);
 
-            yield return new WaitForSeconds(1.75f - PlayerController.Instance.speedMultiplier);
+            yield return new WaitForSeconds(1.75f - CTR_Booster.SpeedMultiplier);
         }
 
+        CTR_Booster.SpeedMultiplier = 1f;
+        
         _isActive = false;
         Activation();
     }

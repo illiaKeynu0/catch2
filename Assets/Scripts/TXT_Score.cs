@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class HealthText : MonoBehaviour
+public class TXT_Score : MonoBehaviour
 {
     private static TextMeshProUGUI text;
 
@@ -9,9 +9,9 @@ public class HealthText : MonoBehaviour
     {
         text = GetComponent<TextMeshProUGUI>();
     }
-
-    public static void TextUpdate(int health)
+    
+    public static void TextUpdate(int score)
     {
-        text.text = Mathf.Max(0, health).ToString();
+        text.text = score.ToString();
     }
 }

@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class HighScoreText : MonoBehaviour
+public class TXT_HighScore : MonoBehaviour
 {
     private static TextMeshProUGUI text;
 

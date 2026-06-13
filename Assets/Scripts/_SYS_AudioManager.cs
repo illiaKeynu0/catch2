@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+public class _SYS_AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance;
+    public static _SYS_AudioManager Instance;
         
     [Serializable]public struct SoundEntry
     {

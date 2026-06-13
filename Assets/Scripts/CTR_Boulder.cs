@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BoulderController : MonoBehaviour
+public class CTR_Boulder : MonoBehaviour
 {
     private Rigidbody2D _rb;
     private LayerMask _layer;
@@ -26,7 +26,7 @@ public class BoulderController : MonoBehaviour
         }
         if (other.gameObject.CompareTag("Water"))
         {
-            AudioManager.Instance.PlaySound(AudioManager.SoundType.BoulderSplash);
+            _SYS_AudioManager.Instance.PlaySound(_SYS_AudioManager.SoundType.BoulderSplash);
             gameObject.layer = _layer;
             _rb.gravityScale = 0.5f;
         }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GemController : MonoBehaviour
+public class CTR_Gem : MonoBehaviour
 {
     private SpriteRenderer _spriteRenderer;
     private Rigidbody2D _rb;
@@ -17,7 +17,7 @@ public class GemController : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _rb = GetComponent<Rigidbody2D>();
 
-        _spriteRenderer.sprite = GameManager.Instance.RandomSprite();
+        _spriteRenderer.sprite = _SYS_GameManager.Instance.RandomSprite();
         
         _rb.AddTorque(Random.Range(-0.5f, 0.5f), ForceMode2D.Impulse);
     }
@@ -26,13 +26,13 @@ public class GemController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            AudioManager.Instance.PlaySound(AudioManager.SoundType.GemCollect);
-            GameManager.Instance.AddScore(1);
+            _SYS_AudioManager.Instance.PlaySound(_SYS_AudioManager.SoundType.GemCollect);
+            _SYS_GameManager.Instance.AddScore(1);
             Destroy(gameObject);
         }
         if (other.gameObject.CompareTag("Water"))
         {
-            AudioManager.Instance.PlaySound(AudioManager.SoundType.GemSplash);
+            _SYS_AudioManager.Instance.PlaySound(_SYS_AudioManager.SoundType.GemSplash);
             gameObject.layer = _layer;
             _rb.gravityScale = 0.5f;
         }
